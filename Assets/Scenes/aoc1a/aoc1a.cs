@@ -4,15 +4,26 @@ using UnityEngine;
 
 public class aoc1a : MonoBehaviour
 {
-
+    public int deeperCount = 0;
     // Start is called before the first frame update
     void Start()
     {
     string[] reader = System.IO.File.ReadAllLines( "Assets/Scenes/aoc1a/input.txt" );
-    for ( int i = 0; i < reader.Length; i++ )
-    {
-        Debug.Log( "Primary key is " + i + ". The data is " + reader[i]  + "\n");
-    }
+        for ( int i = 0; i < reader.Length; i++ )
+        {
+            if (i>0){
+                Debug.Log( "index is " + i + ". The data is " + reader[i]  + " the previous point was " + reader[i-1] + "\n");
+
+
+                //is this value greater than the previous value?
+                if (int.Parse(reader[i])>int.Parse(reader[i-1]))
+                {
+                    deeperCount++;
+                    Debug.Log("Deeper!\n");
+                }
+            }
+        }
+        Debug.Log("There are "+ deeperCount.ToString() + " measurements deeper than the previous one");
     }
 
     // Update is called once per frame
