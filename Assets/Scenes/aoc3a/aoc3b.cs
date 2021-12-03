@@ -5,284 +5,141 @@ using UnityEngine;
 
 public class aoc3b : MonoBehaviour
 {
+    List<string> listOfBits;
+    List<string> listOfeBits;
+
+    int o2 = 0;
+    int co2 = 0;
+
     // Start is called before the first frame update
     void Start()
     {
+        // read input data
         string[] reader = System.IO.File.ReadAllLines( "Assets/Scenes/aoc3a/input.txt" );
-        string oxy ="";
-        int oxyDec = 0;
-        string co2 ="";
-        int co2Dec =0;
-        int[,] bits = new int[reader.Length, reader[0].Length];
-        Debug.Log("array is "+ reader.Length + " by " + reader[0].Length);
-        for ( int i = 0; i < reader.Length; i++ )
+        // dump input into list
+        listOfBits = new List<string>(reader);
+
+        for (int position=0; position < reader[0].Length; position++ )
         {
-            //Debug.Log("-------------");
-
-            //Debug.Log(reader[i]);
-
-            for (int index = 0; index < reader[i].Length; index++)
-            {
-                //Debug.Log(reader[i][index]); // Display it
-                bits[i,index] = int.Parse(reader[i][index].ToString()); // Read next character in string
-                //Debug.Log("bits["+i+"] ["+ index +"] is "+ bits[i,index].ToString()); // Display it
-            }
-        }
-        
-        //find the gamma
-        int[] gamma = new int[reader[0].Length];
-
-       /* for ( int coll = 0; coll < reader[0].Length; coll++ )
-        {
-            int ones = 0;
-            int zeros = 0;
-            
-            for (int row = 0; row < reader.Length; row++ )
-            {
-
-              if (bits[row,coll]==1)
-              {
-                  //Debug.Log("Found a One at "+coll+","+row);
-                  ones++;
-              }  else
-              {
-                  //Debug.Log("Found a Zero at "+coll+","+row);
-                  zeros++;
-              }
-            }
-            Debug.Log("Column["+coll+"] Ones:" +ones.ToString()+ " Zeros:"+zeros.ToString());
-            
-            if (ones>zeros)
-            {
-                gamma[coll] = 1;
-
-            } else if (ones==zeros)
-            {
-                gamma[coll] = 1;
-
-            } else 
-            {
-                gamma[coll] = 0;
-
-            }
-        }
-*/
-        ////////////////////////////////////////////////////////////////////////////////////
-        // should we recalc the count of ones and zeros every time we remove from the list?
-        ////////////////////////////////////////////////////////////////////////////////////
-        
-        // gamma is an array of 12 ints, the most common bit in each column.
-        //Debug.Log("gamma:"+string.Join("", gamma));
-
-        //create a list with all the rows in.
-
-        List<string> listOfBits = new List<string>();
-
-        // populate the list with the original data
-
-        for (int row = 0; row < reader.Length; row++ )
-        {
-            listOfBits.Add(reader[row]);
+            int mostCommon = findMostCommon(listOfBits, position);
+            Debug.Log("most common:" +mostCommon);
+            o2 = removeFromList(listOfBits, position, mostCommon);
         }
 
-        // find the most common bits for the reamaining items in the list.
+        listOfeBits = new List<string>(reader);
 
-        for ( int coll = 0; coll < reader[0].Length; coll++ )
+        for (int position=0; position < reader[0].Length; position++ )
         {
-            int ones = 0;
-            int zeros = 0;
-            
-            for (int row = 0; row < listOfBits.Count; row++ )
-            {
-                int result = String.Compare(listOfBits[row][coll].ToString(),"1");
-                Debug.Log("result: "+result);
-                /*
-                if (listOfBits[row][coll].Equals("1"))
-                {
-                    //Debug.Log("Found a One at "+coll+","+row);
-                    ones++;
-                }  else
-                {
-                    //Debug.Log("Found a Zero at "+coll+","+row);
-                    zeros++;
-                }*/
-                }
-                
-            Debug.Log("Column["+coll+"] Ones:" +ones.ToString()+ " Zeros:"+zeros.ToString());
-            
-            if (ones>zeros)
-            {
-                gamma[coll] = 1;
-
-            } else if (ones==zeros)
-            {
-                gamma[coll] = 1;
-
-            } else 
-            {
-                gamma[coll] = 0;
-
-            }
+            int leastCommon = findLeastCommon(listOfeBits, position);
+            Debug.Log("least common:" +leastCommon);
+            co2 = removeFromList(listOfeBits, position, leastCommon);
         }
 
-        // most common bit in postition 0 is: gamma[0]
-        Debug.Log("Most common bit in position 0 is "+ gamma[0]);
-        Debug.Log("there are "+ listOfBits.Count + " entries in the list");
+        Debug.Log("~~~~~~~>>> o2:"+o2+" co2:"+co2);
 
-
-        //remove all the rows that don't match this gamma
-        for ( int coll = 0; coll < reader[0].Length; coll++ )
-        {
-
-            listOfBits.RemoveAll(row => 
-            {
-                Debug.Log("{"+coll+"} row:" + row + "row[" +coll+"]:"+ row[coll]+ " gamma:" +gamma[coll].ToString());
-                int result = String.Compare(row[coll].ToString(),gamma[coll].ToString());
-                if (result==0)
-                {
-                    Debug.Log("match - keeping "+ result.ToString());
-                    return false;
-                }
-                else
-                {
-                    Debug.Log("no match - removing "+ result.ToString());
-                    return true;                    
-                }
-                
-            });
-            Debug.Log("++++++++++++++");
-            Debug.Log("there are "+ listOfBits.Count + " entries in the list");
-                    for (int listItem = 0; listItem < listOfBits.Count; listItem++)
-                    {
-                        Debug.Log("listitem["+listItem+"] "+listOfBits[listItem]);
-                    }
-            Debug.Log("-------------");
-            
-            if (listOfBits.Count == 1)
-            {
-                
-                oxy = listOfBits[0].ToString();
-
-                int fromBase = 2;
-                int toBase = 10;
-
-                string result = Convert.ToString(Convert.ToInt32(oxy, fromBase), toBase);
-                oxyDec = int.Parse(result);
-
-
-                Debug.Log("just one left: " +oxy+ " -> oxyDec = " +oxyDec.ToString());
-
-
-                
-            }
-        }
-
-//find Epsilon
-        int[] epsilon = new int[reader[0].Length];
-// create epsilon by inverting gamma
-/*        for ( int coll = 0; coll < reader[0].Length; coll++ )
-        {
-            if(gamma[coll]==1) epsilon[coll] = 0; else epsilon[coll] = 1;
-        }
-        
-*/  
-        for ( int coll = 0; coll < reader[0].Length; coll++ )
-        {
-            int ones = 0;
-            int zeros = 0;
-            
-            for (int row = 0; row < reader.Length; row++ )
-            {
-
-              if (bits[row,coll]==1)
-              {
-                  //Debug.Log("Found a One at "+coll+","+row);
-                  ones++;
-              }  else
-              {
-                  //Debug.Log("Found a Zero at "+coll+","+row);
-                  zeros++;
-              }
-            }
-            //Debug.Log("Column["+coll+"] Ones:" +ones.ToString()+ " Zeros:"+zeros.ToString());
-            
-            if (ones>zeros)
-            {
-                epsilon[coll] = 0;
-            } else
-            {
-                epsilon[coll] = 1;
-            }
-        }
-        string epsilonStr = string.Join("", epsilon);
-
-
-
-
-
-        // Epsilon is an array of 12 chars, the least common bit in each column.
-        Debug.Log("epsilon:"+string.Join("", epsilonStr));
-
-        //create a list with all the rows in.
-
-        List<string> listOfeBits = new List<string>();
-
-        // populate the list with the original data
-
-        for (int row = 0; row < reader.Length; row++ )
-        {
-            listOfeBits.Add(reader[row]);
-        }
-
-
-
-        // least common bit in postition 0 is: epsilon[0]
-        Debug.Log("Most common bit in position 0 is "+ epsilon[0]);
-        Debug.Log("there are "+ listOfeBits.Count + " entries in the list");
-
-        //remove all the rows that don't match this gamma
-        for ( int coll = 0; coll < reader[0].Length; coll++ )
-        {
-
-            listOfeBits.RemoveAll(row => 
-            {
-                
-                int result = String.Compare(row[coll].ToString(),epsilon[coll].ToString());
-                if (result==0)
-                {
-                    
-                    return false;
-                }
-                else
-                {
-                    
-                    return true;                    
-                }
-                
-            });
-
-            Debug.Log("there are "+ listOfeBits.Count + " epislon entries in the list");
-            if (listOfeBits.Count == 1)
-            {
-                
-                co2 = listOfeBits[0].ToString();
-
-                int fromBase = 2;
-                int toBase = 10;
-
-                string result = Convert.ToString(Convert.ToInt32(co2, fromBase), toBase);
-                co2Dec = int.Parse(result);
-
-
-                Debug.Log("just one co2 left: " +co2+ " -> co2Dec = " +co2Dec.ToString());
-
-
-                
-            }
-
-        Debug.Log("Life support rating:" + (oxyDec * co2Dec).ToString());
 
     }
+
+
+    int removeFromList(List<string> listOfBits, int position, int mostCommon)
+    {
+            listOfBits.RemoveAll(row => 
+            {
+                if (row[position].ToString().Equals(mostCommon.ToString()))
+                {
+                    //Debug.Log("false - keeping");
+                    return false;
+                }
+                else
+                {
+                    //Debug.Log("true - removing");
+                    return true;                    
+                }
+                
+            });
+        int value = 0;
+        Debug.Log("Num Items in list:" + listOfBits.Count);
+        foreach (var item in listOfBits) Debug.Log(item.ToString());
+        Debug.Log("+++++++++++++");
+        if(listOfBits.Count!=0)
+        {
+            if (listOfBits.Count == 1)
+            {
+                value = convertBase2to10(listOfBits[0]);
+                Debug.Log("just one left: " +listOfBits[0]);
+                Debug.Log("################################### in dec:"+value);
+                Debug.Log("+++++++++++++");
+                
+                
+            }
+        }
+        return value;
+    }
+
+
+    int convertBase2to10(string value)
+    {
+        int fromBase = 2;
+        int toBase = 10;
+
+        string result = Convert.ToString(Convert.ToInt32(value, fromBase), toBase);
+        return int.Parse(result);
+    }
+
+
+    // pass in a list, and a position and it will return the most common value in for that position
+    int findMostCommon(List<string> listOfBits, int position)
+    {
+        Debug.Log("-------------");       
+        int ones=0;
+
+        for (int i = 0; i<listOfBits.Count; i++)
+        {
+            int result = String.Compare(listOfBits[i][position].ToString(),"1");
+            if (result == 0) ones++;
+        }
+
+        Debug.Log("ones:"+ ones + " zeros:" +(listOfBits.Count - ones)+ " count:" +listOfBits.Count);
+
+        int mostCommon;
+        if (ones > (listOfBits.Count - ones)) mostCommon = 1; 
+        else if (ones == (listOfBits.Count - ones)) mostCommon = 1;
+        else mostCommon = 0;
+        return mostCommon;
+    }
+
+
+    int findLeastCommon(List<string> listOfBits, int position)
+    {
+        Debug.Log("-------------");       
+        int ones=0;
+
+        for (int i = 0; i<listOfBits.Count; i++)
+        {
+            int result = String.Compare(listOfBits[i][position].ToString(),"1");
+            if (result == 0) ones++;
+        }
+
+        Debug.Log("ones:"+ ones + " zeros:" +(listOfBits.Count - ones)+ " count:" +listOfBits.Count);
+
+        int leastCommon;
+        if (ones > (listOfBits.Count - ones)) leastCommon = 0; 
+        else if (ones == (listOfBits.Count - ones)) leastCommon = 0;
+        else leastCommon = 1;
+        return leastCommon;
+    }
+
+
+
+
+
+
+
+
+
+
+
+
 
     // Update is called once per frame
     void Update()
@@ -290,7 +147,7 @@ public class aoc3b : MonoBehaviour
          AppHelper.Quit();
     }
 }
-}
+
 
 
 // 3878091
